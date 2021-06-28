@@ -76,7 +76,7 @@ describe("BenchmarkTestCases", function () {
 					}
 
 					function doLoadWebpack() {
-						const baselineWebpack = require.requireActual(
+						const baselineWebpack = jest.requireActual(
 							path.resolve(baselinePath, "lib/index.js")
 						);
 						baselines.push({
@@ -171,51 +171,15 @@ describe("BenchmarkTestCases", function () {
 		if (n <= 30) {
 			//            1      2      ...
 			const data = [
-				6.314,
-				2.92,
-				2.353,
-				2.132,
-				2.015,
-				1.943,
-				1.895,
-				1.86,
-				1.833,
-				1.812,
-				1.796,
-				1.782,
-				1.771,
-				1.761,
-				1.753,
-				1.746,
-				1.74,
-				1.734,
-				1.729,
-				1.725,
-				1.721,
-				1.717,
-				1.714,
-				1.711,
-				1.708,
-				1.706,
-				1.703,
-				1.701,
-				1.699,
-				1.697
+				6.314, 2.92, 2.353, 2.132, 2.015, 1.943, 1.895, 1.86, 1.833, 1.812,
+				1.796, 1.782, 1.771, 1.761, 1.753, 1.746, 1.74, 1.734, 1.729, 1.725,
+				1.721, 1.717, 1.714, 1.711, 1.708, 1.706, 1.703, 1.701, 1.699, 1.697
 			];
 			return data[n - 1];
 		} else if (n <= 120) {
 			//            30     40     50     60     70     80     90     100    110    120
 			const data = [
-				1.697,
-				1.684,
-				1.676,
-				1.671,
-				1.667,
-				1.664,
-				1.662,
-				1.66,
-				1.659,
-				1.658
+				1.697, 1.684, 1.676, 1.671, 1.667, 1.664, 1.662, 1.66, 1.659, 1.658
 			];
 			var a = data[Math.floor(n / 10) - 3];
 			var b = data[Math.ceil(n / 10) - 3];
@@ -256,11 +220,11 @@ describe("BenchmarkTestCases", function () {
 						const z = tDistribution(n - 1);
 						stats.minConfidence = stats.mean - (z * stats.deviation) / nSqrt;
 						stats.maxConfidence = stats.mean + (z * stats.deviation) / nSqrt;
-						stats.text = `${Math.round(stats.mean * 1000)}ms ± ${Math.round(
+						stats.text = `${Math.round(stats.mean * 1000)} ms ± ${Math.round(
 							stats.deviation * 1000
-						)}ms [${Math.round(stats.minConfidence * 1000)}ms; ${Math.round(
+						)} ms [${Math.round(stats.minConfidence * 1000)} ms; ${Math.round(
 							stats.maxConfidence * 1000
-						)}ms]`;
+						)} ms]`;
 						callback(null, bench.stats);
 					},
 					onError: callback
@@ -289,7 +253,7 @@ describe("BenchmarkTestCases", function () {
 						);
 						const config =
 							Object.create(
-								require.requireActual(
+								jest.requireActual(
 									path.join(testDirectory, "webpack.config.js")
 								)
 							) || {};
@@ -314,7 +278,7 @@ describe("BenchmarkTestCases", function () {
 							testName
 						);
 						const config =
-							require.requireActual(
+							jest.requireActual(
 								path.join(testDirectory, "webpack.config.js")
 							) || {};
 						config.output = config.output || {};

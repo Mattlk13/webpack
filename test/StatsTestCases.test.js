@@ -4,8 +4,7 @@ const path = require("path");
 const fs = require("graceful-fs");
 const rimraf = require("rimraf");
 const captureStdio = require("./helpers/captureStdio");
-
-let webpack;
+const webpack = require("..");
 
 /**
  * Escapes regular expression metacharacters
@@ -39,7 +38,6 @@ describe("StatsTestCases", () => {
 	let stderr;
 	beforeEach(() => {
 		stderr = captureStdio(process.stderr, true);
-		webpack = require("..");
 	});
 	afterEach(() => {
 		stderr.restore();
@@ -117,6 +115,11 @@ describe("StatsTestCases", () => {
 			});
 			c.run((err, stats) => {
 				if (err) return done(err);
+				for (const compilation of []
+					.concat(stats.stats || stats)
+					.map(s => s.compilation)) {
+					compilation.logging.delete("webpack.Compilation.ModuleProfile");
+				}
 				if (/error$/.test(testName)) {
 					expect(stats.hasErrors()).toBe(true);
 				} else if (stats.hasErrors()) {
@@ -158,7 +161,7 @@ describe("StatsTestCases", () => {
 					toStringOptions.children = c.options.map(o => o.stats);
 				}
 				// mock timestamps
-				for (const s of [].concat(stats.stats || stats)) {
+				for (const { compilation: s } of [].concat(stats.stats || stats)) {
 					expect(s.startTime).toBeGreaterThan(0);
 					expect(s.endTime).toBeGreaterThan(0);
 					s.endTime = new Date("04/20/1970, 12:42:42 PM").getTime();
@@ -183,14 +186,10 @@ describe("StatsTestCases", () => {
 				const testPath = path.join(base, testName);
 				actual = actual
 					.replace(/\r\n?/g, "\n")
-					.replace(
-						/\([^)]+\) (\[[^\]]+\]\s*)?DeprecationWarning.+(\n\s+at .*)*\n?/g,
-						""
-					)
-					.replace(/[\t ]*Version:.+\n/g, "")
+					.replace(/webpack [^ )]+(\)?) compiled/g, "webpack x.x.x$1 compiled")
 					.replace(new RegExp(quotemeta(testPath), "g"), "Xdir/" + testName)
 					.replace(/(\w)\\(\w)/g, "$1/$2")
-					.replace(/, additional resolving: Xms/g, "");
+					.replace(/, additional resolving: X ms/g, "");
 				expect(actual).toMatchSnapshot();
 				if (testConfig.validate) testConfig.validate(stats, stderr.toString());
 				done();
